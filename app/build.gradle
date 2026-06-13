@@ -3,8 +3,11 @@ plugins {
 }
 
 def localProps = new Properties()
-rootProject.file('local.properties').withInputStream {
-    localProps.load(it)
+def propFile = rootProject.file('local.properties')
+if (propFile.exists()) {
+    propFile.withInputStream {
+        localProps.load(it)
+    }
 }
 
 android {
@@ -51,10 +54,15 @@ android {
 
     signingConfigs {
         release {
-            storeFile file(localProps['storeFile'])
-            keyAlias localProps['keyAlias']
-            keyPassword localProps['storePassword']
-            storePassword localProps['storePassword']
+            def storeFileVal = localProps.getProperty('storeFile', '')
+            if (!storeFileVal.isBlank()) {
+                storeFile file(storeFileVal)
+                keyAlias localProps.getProperty('keyAlias', '')
+                keyPassword localProps.getProperty('storePassword', '')
+                storePassword localProps.getProperty('storePassword', '')
+            } else {
+                signingConfig signingConfigs.debug
+            }
         }
     }
 
@@ -93,9 +101,7 @@ androidComponents {
         def flavors = variant.productFlavors.collectEntries { [(it.first): it.second] }
         def mode = flavors['mode'] ?: 'mode'
         def abi = flavors['abi'] ?: 'abi'
-        variant.outputs.each { output ->
-            output.outputFileName.set("${mode}-${abi}.apk")
-        }
+        variant.outputFileName.set("${mode}-${abi}.apk")
     }
 }
 
