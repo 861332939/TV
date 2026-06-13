@@ -10,6 +10,9 @@ if (propFile.exists()) {
     }
 }
 
+// 判断是否存在正式签名配置
+def hasReleaseSign = !localProps.getProperty('storeFile', '').isBlank()
+
 android {
     namespace = 'com.fongmi.android.tv'
 
@@ -53,15 +56,12 @@ android {
     }
 
     signingConfigs {
-        release {
-            def storeFileVal = localProps.getProperty('storeFile', '')
-            if (!storeFileVal.isBlank()) {
-                storeFile file(storeFileVal)
-                keyAlias localProps.getProperty('keyAlias', '')
-                keyPassword localProps.getProperty('storePassword', '')
-                storePassword localProps.getProperty('storePassword', '')
-            } else {
-                signingConfig signingConfigs.debug
+        if (hasReleaseSign) {
+            release {
+                storeFile file(localProps['storeFile'])
+                keyAlias localProps['keyAlias']
+                keyPassword localProps['storePassword']
+                storePassword localProps['storePassword']
             }
         }
     }
@@ -70,7 +70,8 @@ android {
         release {
             minifyEnabled = true
             shrinkResources = true
-            signingConfig = signingConfigs.release
+            // 有签名用release，无签名自动降级为debug签名
+            signingConfig = hasReleaseSign ? signingConfigs.release : signingConfigs.debug
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro', 'proguard-rules-media.pro'
         }
     }
