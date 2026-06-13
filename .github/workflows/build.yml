@@ -29,9 +29,9 @@ jobs:
       - name: Create Release Dir
         run: mkdir -p Release/apk
 
-      # 关闭Gradle分发校验，彻底规避sha256不匹配问题
+      # 关键：编译 release 但不使用签名配置，避开签名文件null报错
       - name: Build Release APK
-        run: ./gradlew assembleRelease --no-daemon -Dgradle.wrapper.validateDistribution=false
+        run: ./gradlew assembleRelease -PuseDebugSigning=true --no-daemon -Dgradle.wrapper.validateDistribution=false
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
