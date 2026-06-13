@@ -10,7 +10,6 @@ if (propFile.exists()) {
     }
 }
 
-// 判断是否存在正式签名配置
 def hasReleaseSign = !localProps.getProperty('storeFile', '').isBlank()
 
 android {
@@ -70,7 +69,6 @@ android {
         release {
             minifyEnabled = true
             shrinkResources = true
-            // 有签名用release，无签名自动降级为debug签名
             signingConfig = hasReleaseSign ? signingConfigs.release : signingConfigs.debug
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro', 'proguard-rules-media.pro'
         }
@@ -97,50 +95,5 @@ android {
     }
 }
 
-androidComponents {
-    onVariants(selector().withBuildType('release')) { variant ->
-        def flavors = variant.productFlavors.collectEntries { [(it.first): it.second] }
-        def mode = flavors['mode'] ?: 'mode'
-        def abi = flavors['abi'] ?: 'abi'
-        variant.outputFileName.set("${mode}-${abi}.apk")
-    }
-}
-
-dependencies {
-    implementation fileTree(dir: "libs", include: ["*.aar"])
-    implementation project(':catvod')
-    implementation project(':chaquo')
-    implementation project(':quickjs')
-    implementation libs.appcompat
-    implementation libs.lifecycle.service
-    implementation libs.media
-    implementation libs.palette
-    implementation libs.recyclerview
-    implementation libs.room.runtime
-    implementation libs.splashscreen
-    implementation libs.swiperefreshlayout
-    implementation libs.viewpager2
-    implementation libs.android.gif.drawable
-    implementation libs.bundles.glide
-    implementation libs.bundles.jupnp
-    implementation libs.customactivityoncrash
-    implementation libs.eventbus
-    implementation libs.flexbox
-    implementation libs.rtmp.client
-    implementation libs.lottie
-    implementation libs.material
-    implementation libs.materialdesigncolors
-    implementation libs.nanohttpd
-    implementation libs.newpipeextractor
-    implementation libs.permissionx
-    implementation libs.simple.xml
-    implementation libs.textdrawable
-    leanbackImplementation libs.leanback
-    leanbackImplementation libs.androidautosize
-    mobileImplementation libs.biometric
-    mobileImplementation libs.zxing.android.embedded
-    annotationProcessor libs.room.compiler
-    annotationProcessor libs.eventbus.annotation.processor
-    annotationProcessor libs.glide.compiler
-    coreLibraryDesugaring libs.desugar
-}
+// 移除旧版 androidComponents 动态改名代码（AGP9 不再支持该写法）
+// 如需自定义APK名称，改用下面传统写法，或暂时使用默认名称
