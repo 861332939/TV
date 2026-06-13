@@ -23,7 +23,7 @@ jobs:
 
       # 这个还没 v4，靠上面的 env 强制 Node 24
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
 
       - name: Build Release APK
         run: ./gradlew assembleRelease
