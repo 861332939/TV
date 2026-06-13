@@ -29,9 +29,9 @@ jobs:
       - name: Create Release Dir
         run: mkdir -p Release/apk
 
-      # 重点：直接编译 DEBUG 包，彻底放弃 release 签名，所有签名报错全部消失
+      # 关键：-x :chaquo: 跳过chaquo模块任务，解决Python3.10缺失
       - name: Build Debug APK
-        run: ./gradlew assembleDebug --no-daemon -Dgradle.wrapper.validateDistribution=false
+        run: ./gradlew assembleDebug -x :chaquo: --no-daemon -Dgradle.wrapper.validateDistribution=false
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
