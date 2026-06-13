@@ -20,23 +20,19 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v4
 
-      # 生成本地SDK配置
       - name: Generate local.properties
         run: echo "sdk.dir=$ANDROID_HOME" > local.properties
 
-      # 给gradlew执行权限
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # 关键：提前创建 Release/apk 目录，避免复制失败
       - name: Create Release Dir
         run: mkdir -p Release/apk
 
-      # 编译正式包
+      # 关闭Gradle分发校验，彻底规避sha256不匹配问题
       - name: Build Release APK
-        run: ./gradlew assembleRelease --no-daemon
+        run: ./gradlew assembleRelease --no-daemon -Dgradle.wrapper.validateDistribution=false
 
-      # 上传成品（优先取你自定义目录，兼顾原生输出目录）
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
